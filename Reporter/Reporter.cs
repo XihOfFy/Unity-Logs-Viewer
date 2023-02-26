@@ -1865,11 +1865,11 @@ public class Reporter : MonoBehaviour
 
 #if UNITY_CHANGE3
 		int sceneIndex = SceneManager.GetActiveScene().buildIndex ;
-		if( sceneIndex != -1 && string.IsNullOrEmpty( scenes[sceneIndex] ))
+		if( sceneIndex != -1 && scenes!=null && scenes.Length>sceneIndex && string.IsNullOrEmpty( scenes[sceneIndex] ))
 			scenes[ SceneManager.GetActiveScene().buildIndex ] = SceneManager.GetActiveScene().name ;
 #else
 		int sceneIndex = Application.loadedLevel;
-		if (sceneIndex != -1 && string.IsNullOrEmpty(scenes[Application.loadedLevel]))
+		if (sceneIndex != -1  && scenes!=null && scenes.Length>sceneIndex && string.IsNullOrEmpty(scenes[Application.loadedLevel]))
 			scenes[Application.loadedLevel] = Application.loadedLevelName;
 #endif
 
