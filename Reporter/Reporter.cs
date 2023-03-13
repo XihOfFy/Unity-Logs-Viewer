@@ -1676,18 +1676,16 @@ public class Reporter : MonoBehaviour
 	{
 		if (Application.platform == RuntimePlatform.Android ||
 			Application.platform == RuntimePlatform.IPhonePlayer) {
-			if (Touchscreen.current.touches.Count != 1) {
+			if (Touchscreen.current.primaryTouch.phase.ReadValue() == TouchPhase.Canceled || Touchscreen.current.primaryTouch.phase.ReadValue() == TouchPhase.Ended)
+			{
 				gestureDetector.Clear();
 				gestureCount = 0;
 			}
-			else {
-				if (Touchscreen.current.touches[0].phase.ReadValue() == TouchPhase.Canceled || Touchscreen.current.touches[0].phase.ReadValue() == TouchPhase.Ended)
-					gestureDetector.Clear();
-				else if (Touchscreen.current.touches[0].phase.ReadValue() == TouchPhase.Moved) {
-					Vector2 p = Touchscreen.current.touches[0].position.ReadValue();
-					if (gestureDetector.Count == 0 || (p - gestureDetector[gestureDetector.Count - 1]).magnitude > 10)
-						gestureDetector.Add(p);
-				}
+			else if (Touchscreen.current.primaryTouch.phase.ReadValue() == TouchPhase.Moved)
+			{
+				Vector2 p = Touchscreen.current.primaryTouch.position.ReadValue();
+				if (gestureDetector.Count == 0 || (p - gestureDetector[gestureDetector.Count - 1]).magnitude > 10)
+					gestureDetector.Add(p);
 			}
 		}
 		else {
@@ -1697,7 +1695,7 @@ public class Reporter : MonoBehaviour
 			}
 			else {
 				if (Mouse.current.leftButton.isPressed) {
-					Vector2 p = new Vector2(Mouse.current.position.ReadValue().x, Mouse.current.position.ReadValue().y);
+					Vector2 p = Mouse.current.position.ReadValue();
 					if (gestureDetector.Count == 0 || (p - gestureDetector[gestureDetector.Count - 1]).magnitude > 10)
 						gestureDetector.Add(p);
 				}
@@ -1748,7 +1746,7 @@ public class Reporter : MonoBehaviour
 				lastClickTime = -1;
 			}
 			else {
-				if (Touchscreen.current.touches[0].phase.ReadValue() == TouchPhase.Began) {
+				if (Touchscreen.current.primaryTouch.phase.ReadValue() == TouchPhase.Began) {
 					if (lastClickTime == -1)
 						lastClickTime = Time.realtimeSinceStartup;
 					else if (Time.realtimeSinceStartup - lastClickTime < 0.2f) {
@@ -1785,15 +1783,14 @@ public class Reporter : MonoBehaviour
 	{
 		if (Application.platform == RuntimePlatform.Android ||
 		   Application.platform == RuntimePlatform.IPhonePlayer) {
-			if (Touchscreen.current.touches.Count == 1 && Touchscreen.current.touches[0].phase.ReadValue() == TouchPhase.Began) {
-				downPos = Touchscreen.current.touches[0].position.ReadValue();
+			if (Touchscreen.current.touches.Count == 1 && Touchscreen.current.primaryTouch.phase.ReadValue() == TouchPhase.Began) {
+				downPos = Touchscreen.current.primaryTouch.position.ReadValue();
 				return downPos;
 			}
 		}
 		else {
 			if (Mouse.current.leftButton.wasPressedThisFrame) {
-				downPos.x = Mouse.current.position.ReadValue().x;
-				downPos.y = Mouse.current.position.ReadValue().y;
+				downPos = Mouse.current.position.ReadValue();
 				return downPos;
 			}
 		}
@@ -1811,7 +1808,7 @@ public class Reporter : MonoBehaviour
 			if (Touchscreen.current.touches.Count != 1) {
 				return Vector2.zero;
 			}
-			return Touchscreen.current.touches[0].position.ReadValue() - downPos;
+			return Touchscreen.current.primaryTouch.position.ReadValue() - downPos;
 		}
 		else {
 			if (Mouse.current.leftButton.isPressed) {
